@@ -4,7 +4,7 @@ expertMode = true
 
 [nix]
 channel = "stable-25_05"
-packages = ["nano"]
+packages = ["nano", "u-root-cmds"]
 
 [workflows]
 runButton = "Project"
@@ -42,3 +42,4 @@ externalPort = 80
 deploymentTarget = "autoscale"
 run = ["php", "artisan", "serve", "--host=0.0.0.0", "--port=5000"]
 build = ["npm", "run", "build"]
+publicDir = "dist/public"
