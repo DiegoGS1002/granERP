@@ -21,6 +21,7 @@ class MaintenanceERP
             // cadastro resources
             $request->routeIs('products.*') ||
             $request->routeIs('clients.*') ||
+            $request->routeIs('vehicles.*') ||
             $request->routeIs('suppliers.*')
         ) {
             return $next($request);

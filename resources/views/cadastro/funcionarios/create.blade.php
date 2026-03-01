@@ -12,7 +12,7 @@
     </div>
 @endif
 
-<form action="{{route('clients.store')}}" method="POST" class="supplier-form">
+<form action="{{route('employees.store')}}" method="POST" class="supplier-form">
     @csrf
     <div class="form-section">
         <h1>Cadastrar Funcionários</h1>

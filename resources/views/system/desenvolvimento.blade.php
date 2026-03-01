@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manutenção</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: black;}
+        body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: black;}
         img { max-width: 100%; height: auto; }
     </style>
 </head>

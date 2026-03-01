@@ -48,7 +48,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('employee.index') }}" class="block w-full px-3 py-2 text-xs text-black hover:bg-gray-200 rounded">
+                        <a href="{{ route('employees.index') }}" class="block w-full px-3 py-2 text-xs text-black hover:bg-gray-200 rounded">
                             Funcionários
                         </a>
                     </li>
@@ -58,15 +58,15 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('vehicle.index') }}" class="block w-full px-3 py-2 text-xs text-black hover:bg-gray-200 rounded">
+                        <a href="{{ route('vehicles.index') }}" class="block w-full px-3 py-2 text-xs text-black hover:bg-gray-200 rounded">
                             Veículos
                         </a>
                     </li>
-                    <li>
+                   {{--<li>
                         <a href="{{ route('baccarat_accounts.index') }}" class="block w-full px-3 py-2 text-xs text-black hover:bg-gray-200 rounded">
                             Depósitos
                         </a>
-                    </li>
+                    </li>--}}
                 </ul>
             </li>
             <li class="relative">
@@ -263,7 +263,7 @@
 
                 <ul id="dropdown-transporte" class="dropdown-menu absolute left-0 mt-2 flex flex-col gap-1 shadow-lg rounded-md p-2 z-50" style="display: none;">
                     <li>
-                        <a href="{{ route('vehicle.index') }}" class="block px-3 py-2 text-xs text-black hover:bg-gray-200 rounded">
+                        <a href="{{ route('vehicles.index') }}" class="block px-3 py-2 text-xs text-black hover:bg-gray-200 rounded">
                            Frotas
                         </a>
                     </li>

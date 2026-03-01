@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class Employee extends Model
+class Employees extends Model
 {
     public $incrementing = false;
     protected $keyType = 'string';

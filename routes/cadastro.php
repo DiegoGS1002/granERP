@@ -18,6 +18,14 @@ use App\Http\Controllers\ProductSupplierController;
 Route::get('/clients/print', [ClientController::class, 'print'])->name('clients.print');
 Route::get('/products/print', [ProductController::class, 'print'])->name('products.print');
 Route::get('/suppliers/print', [SupplierController::class, 'print'])->name('suppliers.print');
+Route::get('/employees/print', [
+    App\Http\Controllers\EmployeeController::class,
+    'print'
+])->name('employees.print');
+Route::get('/vehicles/print', [
+    App\Http\Controllers\VehicleController::class,
+    'print'
+])->name('vehicles.print');
 
 
 /*
@@ -29,9 +37,9 @@ Route::get('/suppliers/print', [SupplierController::class, 'print'])->name('supp
 Route::resource('clients', ClientController::class);
 Route::resource('products', ProductController::class);
 Route::resource('suppliers', SupplierController::class);
-Route::resource('employee', employeeController::class);
+Route::resource('employees', employeeController::class);
 Route::resource('role', roleController::class);
-Route::resource('vehicle', vehicleController::class);
+Route::resource('vehicles', vehicleController::class);
 
 
 /*

@@ -12,15 +12,15 @@
     </div>
 @endif
 
-<form action="{{route('vehicles.update')}}" method="POST">
+<form action="{{route('vehicles.update', $vehicle->id)}}" method="POST">
     @csrf
     @method('PUT')
-    <input type="text" name="model" placeholder="Modelo" required>
-    <input type="text" name="brand" placeholder="Marca" required>
-    <input type="text" name="year" placeholder="Ano" required>
-    <input type="text" name="plate" placeholder="Placa" required>
-    <input type="text" name="color" placeholder="Cor" required>
-    <input type="text" name="driver" placeholder="Motorista" required>
+    <input type="text" name="model" placeholder="Modelo" required value="{{ $vehicle->model }}">
+    <input type="text" name="brand" placeholder="Marca" required value="{{ $vehicle->brand }}">
+    <input type="text" name="year" placeholder="Ano" required value="{{ $vehicle->year }}">
+    <input type="text" name="plate" placeholder="Placa" required value="{{ $vehicle->plate }}">
+    <input type="text" name="color" placeholder="Cor" required value="{{ $vehicle->color }}">
+    <input type="text" name="driver" placeholder="Motorista" value="{{ $vehicle->driver }}">
 
     <button type="submit">Salvar</button>
     <a class="btn-back" href="{{ route('vehicles.index') }}"> Voltar </a>
