@@ -1,8 +1,10 @@
-# 🏢 Gran ERP
+# 🏢 Nexora EMS ERP
 
 Sistema ERP web desenvolvido inicialmente como projeto integrador da faculdade e atualmente em evolução para uma solução completa de gestão empresarial.
 
 O objetivo do projeto é simular e implementar, na prática, os principais módulos utilizados em sistemas ERP reais, aplicando boas práticas de desenvolvimento, arquitetura e organização de software.
+
+Link de acesso: https://nexora-ems-erp--diegogarcias.replit.app/
 
 ---
 
