@@ -2,6 +2,12 @@
 
 Sistema ERP em Laravel com múltiplos módulos de gestão empresarial (cadastros, produção, vendas, fiscal, financeiro, RH, logística e estoque), com versão web e empacotamento desktop via Electron.
 
+---
+
+Projeto ainda em inicio de desenvolvimento 
+
+---
+
 ## Visão Geral
 
 O projeto evoluiu de um sistema acadêmico para uma base de ERP modular com recursos de:
@@ -13,6 +19,8 @@ O projeto evoluiu de um sistema acadêmico para uma base de ERP modular com recu
 - Painel administrativo e relatórios
 
 Status atual: desenvolvimento ativo.
+
+---
 
 ## Requisitos
 
@@ -28,6 +36,8 @@ Status atual: desenvolvimento ativo.
 - Node.js 20+
 - Dependências do Electron Builder para empacotamento no Windows
 
+---
+
 ## Stack e Dependências Principais
 
 - Laravel 12
@@ -38,6 +48,8 @@ Status atual: desenvolvimento ativo.
 - Bootstrap 5
 - Pest (testes)
 - Electron (aplicação desktop)
+
+---
 
 ## Estrutura de Pastas
 
@@ -50,6 +62,7 @@ routes/              # Rotas web e API separadas por domínio
 tests/               # Testes Unit e Feature
 nexora-desktop/      # Aplicativo desktop Electron
 ```
+---
 
 ## Instalação e Execução (Web)
 
@@ -59,6 +72,8 @@ nexora-desktop/      # Aplicativo desktop Electron
 git clone https://github.com/DiegoGS1002/nexora-ems-erp.git
 cd nexora-ems-erp
 ```
+
+---
 
 ### 2) Setup rápido (recomendado)
 
@@ -77,6 +92,8 @@ Esse comando executa:
 - instalação de dependências front-end
 - build de assets
 
+---
+
 ### 3) Rodar ambiente de desenvolvimento
 
 ```bash
@@ -89,6 +106,8 @@ Esse comando sobe, em paralelo:
 - listener da fila
 - Vite em modo desenvolvimento
 
+---
+
 ### 4) Alternativa manual
 
 ```bash
@@ -100,6 +119,8 @@ npm install
 npm run dev
 php artisan serve
 ```
+
+---
 
 ## Configuração de Banco
 
@@ -121,6 +142,8 @@ php artisan migrate
 
 Se quiser MySQL/PostgreSQL, ajuste as variáveis `DB_*` no `.env` antes de migrar.
 
+---
+
 ## Execução Desktop (Electron)
 
 O projeto possui subprojeto desktop em `nexora-desktop/`.
@@ -133,6 +156,8 @@ npm install
 npm start
 ```
 
+---
+
 ### Build instalador desktop
 
 ```bash
@@ -140,10 +165,14 @@ cd nexora-desktop
 npm run build
 ```
 
+---
+
 Observações:
 
 - O desktop inicia um servidor Laravel interno com `artisan serve`.
 - O app cria `.env` automaticamente (quando ausente) e gera `APP_KEY` se necessário.
+
+---
 
 ## Testes
 
@@ -158,6 +187,8 @@ Ou diretamente:
 ```bash
 php artisan test
 ```
+
+---
 
 ## Detalhamento de Rotas
 
@@ -253,6 +284,8 @@ Endpoints REST para:
 
 Cada entidade principal da API oferece operações: listar, criar, detalhar, atualizar (PUT/PATCH) e remover.
 
+---
+
 ## Comandos Úteis
 
 ```bash
@@ -261,6 +294,8 @@ php artisan migrate:fresh --seed
 php artisan optimize:clear
 npm run build
 ```
+
+---
 
 ## Outras Informações Relevantes
 
