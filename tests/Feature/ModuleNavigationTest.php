@@ -20,6 +20,15 @@ it('redirects to real page when module item route exists', function () {
     $response->assertRedirect(route('clients.index'));
 });
 
+it('redirects dashboard kpi item to live route', function () {
+    $response = $this->get(route('module.item.development', [
+        'module' => 'dashboard',
+        'item' => 'indicadores-kpi',
+    ]));
+
+    $response->assertRedirect(route('dashboard.kpi'));
+});
+
 it('shows development page when module item route does not exist', function () {
     $missing = collect(ModulePageController::allModules())
         ->map(function (array $module) {
@@ -51,4 +60,3 @@ it('shows development page when module item route does not exist', function () {
     $response->assertSee('Funcionalidade em Desenvolvimento');
     $response->assertSee($missing['title']);
 });
-

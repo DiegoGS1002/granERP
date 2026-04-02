@@ -1,9 +1,18 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: dockerfile
     container_name: laravel_app
     ports:
       - "8000:80"
+    environment:
+      DB_CONNECTION: ${DOCKER_DB_CONNECTION:-mysql}
+      DB_HOST: ${DOCKER_DB_HOST:-db}
+      DB_PORT: ${DOCKER_DB_PORT:-3306}
+      DB_DATABASE: ${DOCKER_DB_DATABASE:-nexora}
+      DB_USERNAME: ${DOCKER_DB_USERNAME:-nexora}
+      DB_PASSWORD: ${DOCKER_DB_PASSWORD:-nexora}
     volumes:
       - .:/var/www/html
     depends_on:
@@ -14,14 +23,14 @@ services:
     container_name: laravel_db
     restart: always
     environment:
-      MYSQL_DATABASE: nexora
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: root
-      MYSQL_PASSWORD: "@D4i9e5g7o15"
+      MYSQL_DATABASE: ${DOCKER_DB_DATABASE:-nexora}
+      MYSQL_ROOT_PASSWORD: ${DOCKER_DB_ROOT_PASSWORD:-root}
+      MYSQL_USER: ${DOCKER_DB_USERNAME:-nexora}
+      MYSQL_PASSWORD: ${DOCKER_DB_PASSWORD:-nexora}
     ports:
       # Bind to localhost and use a different host port to avoid conflicts on the host
-      # Change 33061 to another port if you need a different mapping
-      - "127.0.0.1:3306:3306"
+      # Change DOCKER_DB_EXPOSED_PORT to use another host port mapping
+      - "127.0.0.1:${DOCKER_DB_EXPOSED_PORT:-3307}:3306"
     volumes:
       - db_data:/var/lib/mysql
 

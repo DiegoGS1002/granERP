@@ -445,3 +445,88 @@ label {
     text-decoration: none;
     color: white;
 }
+
+/* ══════════════════════════════════════════════
+   DASHBOARD
+   ══════════════════════════════════════════════ */
+.nx-dashboard-page {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.nx-dashboard-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.nx-kpi-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.nx-kpi-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.nx-kpi-card-title {
+    color: #64748B;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.nx-kpi-card-value {
+    font-size: 26px;
+    color: #0F172A;
+    letter-spacing: -0.02em;
+}
+
+.nx-dashboard-grid-2 {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+}
+
+.nx-chart-card {
+    padding: 16px;
+}
+
+.nx-chart-header h3 {
+    font-size: 14px;
+    margin: 0;
+    color: #0F172A;
+}
+
+.nx-chart {
+    margin-top: 10px;
+    min-height: 280px;
+}
+
+.nx-table-card {
+    margin-top: 4px;
+}
+
+@media (max-width: 1024px) {
+    .nx-dashboard-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .nx-dashboard-grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .nx-dashboard-kpis {
+        grid-template-columns: 1fr;
+    }
+}

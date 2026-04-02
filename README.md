@@ -179,6 +179,30 @@ Para recriar o banco do zero:
 php artisan migrate:fresh --seed
 ```
 
+### Docker sem trocar o `.env`
+
+O `docker-compose.yml` agora injeta as variáveis de banco no container `app` via `DOCKER_DB_*`, então você pode manter o `.env` com credenciais locais e usar Docker sem editar arquivo.
+
+Defaults usados no Docker:
+
+```dotenv
+DOCKER_DB_CONNECTION=mysql
+DOCKER_DB_HOST=db
+DOCKER_DB_PORT=3306
+DOCKER_DB_DATABASE=nexora
+DOCKER_DB_USERNAME=nexora
+DOCKER_DB_PASSWORD=nexora
+DOCKER_DB_ROOT_PASSWORD=root
+DOCKER_DB_EXPOSED_PORT=3307
+```
+
+Se quiser customizar, exporte essas variáveis antes de subir o compose.
+
+```bash
+export DOCKER_DB_PASSWORD=minha_senha_forte
+docker compose up -d --build
+```
+
 ---
 
 ## Painel Administrativo (Filament)

@@ -2,13 +2,10 @@
 
 ## 🎯 Objetivo
 
-Construir um dashboard estilo **Power BI / SaaS moderno**, com:
+Construir um dashboard estilo **Power BI / SaaS moderno**, agora organizado em duas grandes áreas:
 
-* KPIs dinâmicos
-* Gráficos interativos
-* Filtros globais
-* Drill-down
-* Atualização em tempo real
+1. **Visão Geral** → painel principal com métricas do sistema
+2. **Indicadores KPI** → relatórios e análise de desempenho
 
 ---
 
@@ -38,11 +35,15 @@ Construir um dashboard estilo **Power BI / SaaS moderno**, com:
 
 ```
 app/Livewire/
- └── Dashboard.php
+ ├── Dashboard.php
+ ├── Overview.php
+ └── KpiReport.php
 
 resources/views/
  ├── livewire/
- │    └── dashboard.blade.php
+ │    ├── dashboard.blade.php
+ │    ├── overview.blade.php
+ │    └── kpi-report.blade.php
  ├── components/
  │    ├── kpi-card.blade.php
  │    ├── chart-line.blade.php
@@ -52,30 +53,86 @@ resources/views/
 
 ---
 
-# ⚙️ 3. Componente Livewire (Avançado)
+# 🧭 3. VISÃO GERAL (Overview)
+
+## 🎯 Objetivo
+
+Mostrar rapidamente o estado do sistema:
+
+* Faturamento
+* Pedidos
+* Estoque
+* Despesas
+
+---
+
+## 🧠 Livewire (Overview.php)
 
 ```php
-class Dashboard extends Component
+class Overview extends Component
 {
-    public $periodo = 'mes';
-    public $dataInicio;
-    public $dataFim;
+    public $kpis = [];
 
+    public function mount()
+    {
+        $this->kpis = [
+            'faturamento' => 128590,
+            'produtos' => 5284,
+            'pedidos' => 72,
+            'despesas' => 78445
+        ];
+    }
+
+    public function render()
+    {
+        return view('livewire.overview');
+    }
+}
+```
+
+---
+
+## 🎨 Blade (overview.blade.php)
+
+```blade
+<div class="grid grid-cols-4 gap-6 mb-6">
+    <x-kpi-card title="Faturamento" :value="$kpis['faturamento']" />
+    <x-kpi-card title="Produtos" :value="$kpis['produtos']" />
+    <x-kpi-card title="Pedidos" :value="$kpis['pedidos']" />
+    <x-kpi-card title="Despesas" :value="$kpis['despesas']" />
+</div>
+```
+
+---
+
+# 📊 4. INDICADORES KPI (Relatórios)
+
+## 🎯 Objetivo
+
+Análise profunda de desempenho:
+
+* Evolução de faturamento
+* Distribuição por categoria
+* Performance por período
+
+---
+
+## 🧠 Livewire (KpiReport.php)
+
+```php
+class KpiReport extends Component
+{
     public $faturamento = [];
     public $categorias = [];
     public $distribuicao = [];
 
     public function mount()
     {
-        $this->dataInicio = now()->startOfMonth();
-        $this->dataFim = now()->endOfMonth();
-
         $this->loadData();
     }
 
     public function loadData()
     {
-        // Simulação (substituir por queries reais)
         $this->faturamento = [12000, 19000, 30000, 50000];
         $this->categorias = ['Jan', 'Fev', 'Mar', 'Abr'];
         $this->distribuicao = [34, 28, 20, 18];
@@ -87,67 +144,16 @@ class Dashboard extends Component
         ]);
     }
 
-    public function updatedPeriodo()
-    {
-        $this->loadData();
-    }
-
     public function render()
     {
-        return view('livewire.dashboard');
+        return view('livewire.kpi-report');
     }
 }
 ```
 
 ---
 
-# 🎨 4. Filtros Globais
-
-```blade
-<div class="flex gap-4 mb-6">
-    <select wire:model="periodo" class="border rounded p-2">
-        <option value="mes">Mês</option>
-        <option value="ano">Ano</option>
-    </select>
-
-    <input type="date" wire:model="dataInicio" />
-    <input type="date" wire:model="dataFim" />
-</div>
-```
-
----
-
-# 📊 5. Gráficos Avançados
-
-## Inicialização
-
-```javascript
-let chartLine;
-let chartDonut;
-
-document.addEventListener('livewire:load', function () {
-
-    chartLine = new ApexCharts(document.querySelector("#chart-line"), {
-        chart: { type: 'line', height: 300 },
-        series: [{ name: 'Faturamento', data: [] }],
-        xaxis: { categories: [] }
-    });
-
-    chartLine.render();
-
-    chartDonut = new ApexCharts(document.querySelector("#chart-donut"), {
-        chart: { type: 'donut' },
-        series: [],
-        labels: ['Comércio', 'Construção', 'Serviços', 'Tecnologia']
-    });
-
-    chartDonut.render();
-});
-```
-
----
-
-# 🔄 6. Atualização Dinâmica
+# 📈 5. Gráficos (KPI)
 
 ```javascript
 Livewire.on('updateCharts', data => {
@@ -164,7 +170,7 @@ Livewire.on('updateCharts', data => {
 
 ---
 
-# 🔍 7. Drill-down (Nível Power BI)
+# 🔍 6. Drill-down (Nível Power BI)
 
 ```javascript
 chartLine.updateOptions({
@@ -181,7 +187,7 @@ chartLine.updateOptions({
 
 ---
 
-# ⚡ 8. Tempo Real
+# ⚡ 7. Tempo Real
 
 ```blade
 <div wire:poll.10s>
@@ -191,13 +197,7 @@ chartLine.updateOptions({
 
 ---
 
-# 📋 9. Tabela Inteligente
-
-## Funcionalidades
-
-* Paginação
-* Busca
-* Ordenação
+# 📋 8. Tabela Inteligente
 
 ```blade
 <input type="text" wire:model="search" placeholder="Buscar..." />
@@ -205,9 +205,7 @@ chartLine.updateOptions({
 
 ---
 
-# 🎨 10. Design Profissional
-
-## Classes padrão
+# 🎨 9. Design Profissional
 
 ```
 bg-white
@@ -218,47 +216,27 @@ transition-all
 p-4
 ```
 
-## Grid
-
-```
-grid grid-cols-4 gap-6
-```
-
 ---
 
-# 🧠 11. Boas Práticas
+# 🧠 10. Boas Práticas
 
 ## Faça
 
-* Componentize tudo
-* Use eventos do Livewire
-* Atualize gráficos sem recriar
+* Separar visão geral de análise
+* Componentizar tudo
+* Atualizar gráficos dinamicamente
 
 ## Não faça
 
-* Misturar lógica JS com Blade
+* Misturar responsabilidades
 * Recarregar página
 
 ---
 
-# 🚀 12. Evolução do Sistema
+# 🚀 11. Evolução
 
-## Próximos níveis
-
-* Multi-tenant dashboards
+* Dashboards por módulo (Financeiro, Vendas)
 * Permissões por usuário
-* Exportação PDF
-* Integração com BI externo
+* Exportação de relatórios
 
 ---
-
-# 🏁 Conclusão
-
-Você agora tem um dashboard:
-
-* Escalável
-* Profissional
-* Interativo
-* Nível SaaS
-
-Pronto para produção 🚀
