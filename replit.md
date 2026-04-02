@@ -1,49 +1,78 @@
-# Gran Fornecedores
+# Nexora EMS ERP
 
-A Laravel 12 + Filament 4.5 supplier/product management system.
+Sistema ERP modular em Laravel 12 com painel administrativo em Filament 4.5.
 
-## Overview
+## Visão Geral
 
-This is a web application for managing suppliers, products, and clients. It includes:
-- Main frontend interface with navigation for Products, Suppliers, and Clients
-- Filament admin panel at `/admin` for backend management
-- SQLite database for data storage
+O projeto organiza funcionalidades por domínio de negócio (cadastro, produção, vendas, compras, fiscal, financeiro, RH, logística, estoque, perfil e administração). A página inicial (`/`) exibe os módulos e as funcionalidades ainda não concluídas mostram a tela "Em Breve" via middleware `MaintenanceERP`.
 
-## Tech Stack
+## Stack
 
-- **Backend**: Laravel 12 (PHP 8.2)
-- **Admin Panel**: Filament 4.5
-- **Frontend Assets**: Vite + Tailwind CSS
-- **Database**: SQLite
+- **Backend**: Laravel 12 (PHP 8.2+)
+- **Admin Panel**: Filament 4.5 (`/admin`)
+- **Frontend**: Blade + Vite 7 + Tailwind CSS 4 + Bootstrap 5
+- **Testes**: Pest 3
+- **Banco de dados**: configurável por `DB_*` no `.env` (em `.env.example`, padrão atual: MySQL)
 
-## Project Structure
+## Estrutura Essencial
 
-```
+```text
 app/
-  Http/Controllers/      # Controllers for Clients, Products, Suppliers
-  Models/                # Eloquent models (Client, Product, Supplier, User)
-  Providers/             # Service providers including Filament panel
-config/                  # Laravel configuration files
-database/
-  migrations/            # Database migrations
-  seeders/               # Database seeders
-public/                  # Public assets including Filament JS/CSS
-resources/               # Blade views, CSS, JS
-routes/                  # Route definitions
-storage/                 # Storage for sessions, cache, logs
+  Http/Controllers/
+    Api/
+  Http/Middleware/        # MaintenanceERP
+  Livewire/Cadastro/      # Telas de cadastro com Livewire
+  Models/
+  Providers/Filament/     # AdminPanelProvider
+routes/
+  web.php                 # Inclui os módulos web
+  api.php                 # Endpoints REST
+  cadastro.php
+  administracao.php
+  compras.php
+  producao.php
+  vendas.php
+  fiscal.php
+  financeiro.php
+  rh.php
+  logistica.php
+  estoque.php
+  perfil.php
 ```
 
-## Running Locally
+## Setup e Execução
 
-The application runs on port 5000:
+Use os scripts oficiais do `composer.json`:
+
 ```bash
-php artisan serve --host=0.0.0.0 --port=5000
+composer run setup
+composer run dev
 ```
 
-## Database
+O `setup` instala dependências, cria `.env` quando necessário, gera `APP_KEY`, executa migrações (`php artisan migrate --force`) e compila assets.
 
-The application uses the database configured via `DB_*` variables in `.env` (default: MySQL). Migrations are automatically applied during setup.
+## Middleware de Desenvolvimento
 
-## Admin Panel
+O middleware `MaintenanceERP` está aplicado ao grupo de rotas web em `routes/web.php` e controla o que já pode renderizar normalmente.
 
-Access the Filament admin panel at `/admin`. You'll need to create a user account to log in.
+Rotas liberadas atualmente incluem:
+- `home`
+- `module.show`
+- `module.item.development`
+- `products.*`, `clients.*`, `vehicles.*`, `employees.*`, `suppliers.*`
+- `role.*` (recurso de funções)
+
+As demais rotas web retornam a view `system.desenvolvimento` até implementação completa.
+
+## Filament
+
+- Painel em `/admin`
+- Provider registrado em `bootstrap/providers.php`
+- Configuração em `app/Providers/Filament/AdminPanelProvider.php`
+- Discovery automático em `app/Filament/Resources`, `app/Filament/Pages` e `app/Filament/Widgets`
+
+Para criar usuário administrador:
+
+```bash
+php artisan make:filament-user
+```

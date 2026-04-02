@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Nexora ERP — Sistema de Gestão Empresarial">
 
-    <title>@yield('title', 'Nexora ERP') | Nexora</title>
+    <title>{{ $title ?? trim($__env->yieldContent('title', 'Nexora ERP')) }} | Nexora</title>
 
     {{-- Google Fonts — Inter --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,6 +14,7 @@
 
     {{-- Fonts & Styles --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
     @stack('styles')
 </head>
 <body>
@@ -43,12 +44,14 @@
             {{-- Conteúdo Principal --}}
             <main class="main-content">
                 @yield('content')
+                {{ $slot ?? '' }}
             </main>
 
         </div>{{-- /.nx-page --}}
 
     </div>{{-- /.nx-app-wrapper --}}
 
+    @livewireScripts
     @stack('scripts')
 </body>
 </html>

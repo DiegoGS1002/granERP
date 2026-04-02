@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Controllers\ModulePageController;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -9,6 +10,12 @@ class MaintenanceERP
 {
     public function handle(Request $request, Closure $next)
     {
+        $routeName = $request->route()?->getName();
+
+        if ($routeName && in_array($routeName, ModulePageController::moduleItemRouteNames(), true)) {
+            return $next($request);
+        }
+
         /*
         |--------------------------------------------------------------------------
         | ROTAS LIBERADAS (NÃO MOSTRAM A TELA)
@@ -18,6 +25,8 @@ class MaintenanceERP
         if (
             // home page
             $request->routeIs('home') ||
+            $request->routeIs('module.show') ||
+            $request->routeIs('module.item.development') ||
             // cadastro resources
             $request->routeIs('products.*') ||
             $request->routeIs('clients.*') ||

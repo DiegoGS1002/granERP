@@ -12,6 +12,9 @@ Route::middleware([MaintenanceERP::class])->group(function () {
         ]);
     })->name('home');
 
+    Route::get('/modulo/{module}/item/{item}', [ModulePageController::class, 'featureDevelopment'])
+        ->name('module.item.development');
+
     Route::get('/modulo/{module}', [ModulePageController::class, 'show'])->name('module.show');
 
 /*

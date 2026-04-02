@@ -29,11 +29,8 @@
 ══════════════════════════════════════ --}}
 <div class="mod-grid">
     @foreach($module['items'] as $item)
-        @php
-            $href = $item['route'] ? route($item['route']) : '#';
-        @endphp
-        <a href="{{ $href }}"
-           class="mod-card"
+        <a href="{{ $item['href'] }}"
+           class="mod-card {{ $item['available'] ? '' : 'mod-card--disabled' }}"
            style="--mod-color: {{ $module['color'] }}">
 
             <div class="mod-card-icon">
@@ -46,7 +43,11 @@
             </div>
 
             <div class="mod-card-arrow">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                @if($item['available'])
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                @else
+                    <span class="mod-soon-badge">Em breve</span>
+                @endif
             </div>
         </a>
     @endforeach

@@ -1,10 +1,5 @@
-@extends('layouts.app')
-@section('title', 'Novo Cliente')
-@section('content')
-
 <div class="nx-form-page">
 
-    {{-- Cabeçalho --}}
     <div class="nx-form-header">
         <a href="{{ route('clients.index') }}" class="nx-back-link">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
@@ -13,11 +8,10 @@
             </svg>
             Voltar para Clientes
         </a>
-        <h1 class="nx-form-title">Cadastrar Cliente</h1>
-        <p class="nx-form-subtitle">Preencha os dados do novo cliente</p>
+        <h1 class="nx-form-title">{{ $isEditing ? 'Editar Cliente' : 'Cadastrar Cliente' }}</h1>
+        <p class="nx-form-subtitle">{{ $isEditing ? 'Atualize os dados do cliente' : 'Preencha os dados do novo cliente' }}</p>
     </div>
 
-    {{-- Erros --}}
     @if ($errors->any())
         <div class="alert-error">
             <ul>
@@ -28,10 +22,8 @@
         </div>
     @endif
 
-    <form action="{{ route('clients.store') }}" method="POST">
-        @csrf
+    <form wire:submit="save">
 
-        {{-- Card: Informações Pessoais --}}
         <div class="nx-form-card">
             <div class="nx-form-section">
                 <div class="nx-form-section-header">
@@ -42,16 +34,16 @@
                             <circle cx="12" cy="7" r="4"/>
                         </svg>
                     </div>
-                    <h3 class="nx-form-section-title">Informações Pessoais</h3>
+                    <h3 class="nx-form-section-title">Informacoes Pessoais</h3>
                 </div>
                 <div class="grid grid-2">
                     <div class="nx-field">
                         <label>Nome</label>
-                        <input type="text" name="name" value="{{ old('name') }}" placeholder="Nome completo ou fantasia" required>
+                        <input type="text" wire:model.blur="name" placeholder="Nome completo ou fantasia" required>
                     </div>
                     <div class="nx-field">
                         <label>CNPJ</label>
-                        <input type="text" name="taxNumber" value="{{ old('taxNumber') }}" placeholder="00.000.000/0000-00" required>
+                        <input type="text" wire:model.blur="taxNumber" placeholder="00.000.000/0000-00" required>
                     </div>
                 </div>
             </div>
@@ -69,11 +61,11 @@
                 <div class="grid grid-2">
                     <div class="nx-field">
                         <label>E-mail</label>
-                        <input type="email" name="email" value="{{ old('email') }}" placeholder="email@exemplo.com" required>
+                        <input type="email" wire:model.blur="email" placeholder="email@exemplo.com" required>
                     </div>
                     <div class="nx-field">
                         <label>Telefone</label>
-                        <input type="text" name="phone_number" value="{{ old('phone_number') }}" placeholder="(00) 00000-0000" required>
+                        <input type="text" wire:model.blur="phone_number" placeholder="(00) 00000-0000" required>
                     </div>
                 </div>
             </div>
@@ -87,24 +79,23 @@
                             <circle cx="12" cy="10" r="3"/>
                         </svg>
                     </div>
-                    <h3 class="nx-form-section-title">Endereço & Jurídico</h3>
+                    <h3 class="nx-form-section-title">Endereco e Juridico</h3>
                 </div>
                 <div class="grid grid-1" style="margin-bottom:16px;">
                     <div class="nx-field">
-                        <label>Endereço</label>
-                        <input type="text" name="address" value="{{ old('address') }}" placeholder="Rua, número, bairro, cidade - UF" required>
+                        <label>Endereco</label>
+                        <input type="text" wire:model.blur="address" placeholder="Rua, numero, bairro, cidade - UF" required>
                     </div>
                 </div>
                 <div class="grid grid-1">
                     <div class="nx-field">
-                        <label>Razão Social</label>
-                        <input type="text" name="social_name" value="{{ old('social_name') }}" placeholder="Razão Social da empresa">
+                        <label>Razao Social</label>
+                        <input type="text" wire:model.blur="social_name" placeholder="Razao Social da empresa">
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- Botões --}}
         <div class="nx-form-footer">
             <a href="{{ route('clients.index') }}" class="nx-btn nx-btn-ghost">Cancelar</a>
             <button type="submit" class="nx-btn nx-btn-primary">
@@ -114,10 +105,10 @@
                     <polyline points="17 21 17 13 7 13 7 21"/>
                     <polyline points="7 3 7 8 15 8"/>
                 </svg>
-                Salvar Cliente
+                {{ $isEditing ? 'Atualizar Cliente' : 'Salvar Cliente' }}
             </button>
         </div>
     </form>
 
 </div>
-@endsection
+

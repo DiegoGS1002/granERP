@@ -10,6 +10,8 @@ A aplicação expõe uma página inicial (`/`) com todos os módulos disponívei
 
 **Status:** desenvolvimento ativo.
 
+**Última atualização da documentação:** 2026-04-01.
+
 ### Módulos
 
 | Módulo | Status |
@@ -123,7 +125,7 @@ Esse comando executa em sequência:
 1. `composer install`
 2. Criação de `.env` (se ausente, a partir de `.env.example`)
 3. `php artisan key:generate`
-4. `php artisan migrate`
+4. `php artisan migrate --force`
 5. `npm install`
 6. `npm run build`
 
@@ -185,7 +187,7 @@ Acesse em: `/admin`
 
 - Login habilitado por padrão.
 - Cor primária: Amber.
-- Descobre automaticamente Resources, Pages e Widgets em `app/Filament/`.
+- Descobre automaticamente Resources, Pages e Widgets em `app/Filament/Resources`, `app/Filament/Pages` e `app/Filament/Widgets`.
 - Widgets padrão: `AccountWidget` e `FilamentInfoWidget`.
 
 Para criar o primeiro usuário administrador:
@@ -201,12 +203,16 @@ php artisan make:filament-user
 Aplicado globalmente a todas as rotas web. Rotas **liberadas** (renderizam normalmente):
 
 - `home` (página inicial `/`)
+- `module.show`
+- `module.item.development`
 - `products.*`
 - `clients.*`
 - `vehicles.*`
 - `employees.*`
 - `roles.*`
 - `suppliers.*`
+
+> Observação: atualmente o recurso de funções foi registrado como `role.*` em `routes/cadastro.php`.
 
 Todas as demais rotas retornam a view `system.desenvolvimento` ("Em Breve") até que o módulo esteja pronto.
 
@@ -311,6 +317,7 @@ Todas as rotas web estão sob o middleware `MaintenanceERP`. O arquivo `routes/w
 |---|---|---|---|
 | `GET` | `/` | `home` | Página inicial com todos os módulos |
 | `GET` | `/modulo/{module}` | `module.show` | Página de detalhes do módulo |
+| `GET` | `/modulo/{module}/item/{item}` | `module.item.development` | Tela de funcionalidade em desenvolvimento |
 
 ### Padrão `Route::resource`
 
@@ -334,7 +341,12 @@ Cada recurso expõe:
 
 #### Cadastro (`routes/cadastro.php`)
 
-- `Route::resource` → `clients`, `products`, `suppliers`, `employees`, `role`, `vehicles`
+- Rotas Livewire (GET):
+  - `clients.index`, `clients.create`, `clients.edit`
+  - `products.index`, `products.create`, `products.edit`
+  - `suppliers.index`, `suppliers.create`, `suppliers.edit`
+  - `employees.index`, `employees.create`, `employees.edit`
+- `Route::resource` → `role`, `vehicles`
 - Rotas extras de impressão:
   - `GET /clients/print` → `clients.print`
   - `GET /products/print` → `products.print`

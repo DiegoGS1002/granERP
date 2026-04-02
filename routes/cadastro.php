@@ -1,6 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Cadastro\Clientes\Form as ClientForm;
+use App\Livewire\Cadastro\Clientes\Index as ClientIndex;
+use App\Livewire\Cadastro\Funcionarios\Form as EmployeeForm;
+use App\Livewire\Cadastro\Funcionarios\Index as EmployeeIndex;
+use App\Livewire\Cadastro\Fornecedores\Form as SupplierForm;
+use App\Livewire\Cadastro\Fornecedores\Index as SupplierIndex;
+use App\Livewire\Cadastro\Produtos\Form as ProductForm;
+use App\Livewire\Cadastro\Produtos\Index as ProductIndex;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SupplierController;
@@ -34,10 +42,18 @@ Route::get('/vehicles/print', [
 |--------------------------------------------------------------------------
 */
 
-Route::resource('clients', ClientController::class);
-Route::resource('products', ProductController::class);
-Route::resource('suppliers', SupplierController::class);
-Route::resource('employees', EmployeeController::class);
+Route::get('/clients', ClientIndex::class)->name('clients.index');
+Route::get('/clients/create', ClientForm::class)->name('clients.create');
+Route::get('/clients/{client}/edit', ClientForm::class)->name('clients.edit');
+Route::get('/products', ProductIndex::class)->name('products.index');
+Route::get('/products/create', ProductForm::class)->name('products.create');
+Route::get('/products/{product}/edit', ProductForm::class)->name('products.edit');
+Route::get('/suppliers', SupplierIndex::class)->name('suppliers.index');
+Route::get('/suppliers/create', SupplierForm::class)->name('suppliers.create');
+Route::get('/suppliers/{supplier}/edit', SupplierForm::class)->name('suppliers.edit');
+Route::get('/employees', EmployeeIndex::class)->name('employees.index');
+Route::get('/employees/create', EmployeeForm::class)->name('employees.create');
+Route::get('/employees/{employee}/edit', EmployeeForm::class)->name('employees.edit');
 Route::resource('role', RoleController::class);
 Route::resource('vehicles', VehicleController::class);
 

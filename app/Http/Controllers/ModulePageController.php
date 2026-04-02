@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 class ModulePageController extends Controller
 {
@@ -156,10 +157,75 @@ class ModulePageController extends Controller
             abort(404);
         }
 
+        $data['items'] = self::resolveItems($data);
+
         return view('modules.show', [
             'module'  => $data,
             'modules' => self::$modules,
         ]);
+    }
+
+    public function featureDevelopment(string $module, string $item)
+    {
+        $data = self::$modules[$module] ?? null;
+
+        if (! $data) {
+            abort(404);
+        }
+
+        $resolvedItem = collect(self::resolveItems($data))->firstWhere('key', $item);
+
+        if (! $resolvedItem) {
+            abort(404);
+        }
+
+        if ($resolvedItem['available']) {
+            return redirect()->to($resolvedItem['href']);
+        }
+
+        return view('system.desenvolvimento', [
+            'title' => $resolvedItem['title'],
+            'description' => $resolvedItem['description'],
+            'moduleSlug' => $data['slug'],
+            'moduleName' => $data['name'],
+            'color' => $data['color'],
+            'icon' => $resolvedItem['icon'],
+        ]);
+    }
+
+    public static function moduleItemRouteNames(): array
+    {
+        return collect(self::$modules)
+            ->pluck('items')
+            ->flatten(1)
+            ->pluck('route')
+            ->filter(fn ($route) => is_string($route) && $route !== '')
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    private static function resolveItems(array $module): array
+    {
+        return collect($module['items'])
+            ->map(function (array $item) use ($module) {
+                $routeName = $item['route'] ?? null;
+                $available = is_string($routeName) && $routeName !== '' && Route::has($routeName);
+                $key = Str::slug($item['title']);
+
+                $item['key'] = $key;
+                $item['available'] = $available;
+                $item['href'] = $available
+                    ? route($routeName)
+                    : route('module.item.development', [
+                        'module' => $module['slug'],
+                        'item' => $key,
+                    ]);
+
+                return $item;
+            })
+            ->values()
+            ->all();
     }
 
     /** Expõe a lista completa para uso em views (navbar) */
