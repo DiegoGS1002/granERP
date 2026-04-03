@@ -10,7 +10,9 @@ A aplicação expõe uma página inicial (`/`) com todos os módulos disponívei
 
 **Status:** desenvolvimento ativo.
 
-**Última atualização da documentação:** 2026-04-02.
+**Última atualização da documentação:** 2026-04-03 (README e `replit.md` revisados).
+
+> Guia rápido para ambiente Replit: veja `replit.md`.
 
 ### Módulos
 
@@ -19,6 +21,8 @@ A aplicação expõe uma página inicial (`/`) com todos os módulos disponívei
 | Cadastro (Clientes, Fornecedores, Produtos, Funcionários, Funções, Veículos) | ✅ Ativo |
 | Dashboard — Visão Geral (`/dashboard`) | 🔶 Implementado (dados de exemplo) |
 | Dashboard — Indicadores KPI (`/dashboard/kpi`) | 🔶 Implementado (dados de exemplo) |
+| Controle de Usuários (`/users`) | ✅ Ativo (CRUD + status + licença + módulos) |
+| Configurações do Sistema (`/configuracoes`) | ✅ Ativo (9 seções) |
 | Produção (Ordens de Produção) | 🚧 Em desenvolvimento |
 | Estoque | 🚧 Em desenvolvimento |
 | Vendas (Pedidos, CRM, Relatórios) | 🚧 Em desenvolvimento |
@@ -27,7 +31,7 @@ A aplicação expõe uma página inicial (`/`) com todos os módulos disponívei
 | Financeiro (Plano de Contas, Contas, Caixa, DRE) | 🚧 Em desenvolvimento |
 | RH (Jornada, Ponto, Folha, Relatórios) | 🚧 Em desenvolvimento |
 | Transporte / Logística | 🚧 Em desenvolvimento |
-| Perfil e Segurança (Usuários, Permissões, Logs) | 🚧 Em desenvolvimento |
+| Perfil e Segurança (Permissões, Logs) | 🚧 Em desenvolvimento |
 | Painel Administrativo Filament (`/admin`) | ✅ Ativo |
 
 ---
@@ -80,8 +84,10 @@ app/
         ProductApiController.php
         ProductSupplierApiController.php
         SupplierApiController.php
+      ConfigurationController.php   # Configurações do sistema (GET/POST /configuracoes)
+      UsersController.php           # Controle de usuários com status, licença e módulos
     Middleware/
-      MaintenanceERP.php
+      MaintenanceERP.php            # Whitelist de rotas liberadas
   Livewire/             # Componentes Livewire
     Cadastro/
       Clientes/         # Index + Form (full-page)
@@ -92,51 +98,59 @@ app/
       Overview.php      # Visão Geral do Dashboard
       KpiReport.php     # Indicadores KPI com drill-down
   Models/               # Modelos Eloquent
+    Setting.php         # Configurações do sistema (key-value com cache)
   Providers/
     Filament/           # AdminPanelProvider (Filament)
   Services/             # Service classes com lógica de negócio
 config/
 database/
   migrations/
+    2026_04_03_200000_create_settings_table.php
   seeders/
+    SettingsSeeder.php  # Valores padrão para todas as 9 seções de configuração
   factories/
 resources/
   css/
     app.css             # Ponto de entrada (importa os partials abaixo)
     _base.css           # Reset, tipografia, utilitários globais
     _layout.css         # Sidebar, topbar, wrapper, variáveis CSS (:root)
-    _components.css     # Cards, KPIs, badges, botões, gráficos, atividades
+    _components.css     # Cards, KPIs, badges, botões, gráficos, modal de licença, settings
     _tables.css         # Estilos de tabelas dos módulos
   js/
   views/
+    admin/
+      users/            # Controle de usuários (index, create, edit)
+      settings/
+        index.blade.php # Página de configurações (9 abas)
     cadastro/           # Views CRUD: clientes, fornecedores, produtos, funcionários, funções, veículos
-    administrativo/     # Views de usuários, permissões e logs
+    administrativo/     # Views de permissões e logs
     components/
       dashboard/        # Blade components reutilizáveis do dashboard
         kpi-card.blade.php
         chart-line.blade.php
         chart-donut.blade.php
         table.blade.php
-    layouts/            # Layout principal da aplicação
+    layouts/
+      app.blade.php     # Layout principal — inclui modal de aviso de licença
     livewire/
       cadastro/         # Views Livewire de cadastro
       dashboard/
         overview.blade.php    # View da Visão Geral
         kpi-report.blade.php  # View dos Indicadores KPI
     modules/            # Página de detalhes do módulo (show.blade.php)
-    partials/           # Partials reutilizáveis
+    partials/           # Partials reutilizáveis (navbar.blade.php)
     system/
       desenvolvimento.blade.php  # Tela "Em Breve"
 routes/
   web.php               # Ponto de entrada — inclui todos os arquivos abaixo
-  administracao.php
+  administracao.php     # GET/POST /configuracoes, profile
   cadastro.php
   compras.php
   estoque.php
   financeiro.php
   fiscal.php
   logistica.php
-  perfil.php
+  perfil.php            # users.*, permissions.*, logs.*
   producao.php          # Inclui também as rotas do Dashboard
   rh.php
   vendas.php
@@ -195,6 +209,28 @@ npm run dev
 php artisan serve
 ```
 
+### 5. Execução no Replit
+
+O ambiente Replit deste projeto está configurado em `.replit` com:
+
+- workflow `Project` iniciando `php artisan serve --host=0.0.0.0 --port=5000`
+- mapeamento de porta `5000 -> 80` para acesso web da aplicação
+- porta `3000` disponível para Vite/HMR quando necessário
+- `deployment` com `build = npm run build`
+
+Fluxo mínimo para abrir no Replit:
+
+```bash
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --force
+php artisan serve --host=0.0.0.0 --port=5000
+```
+
+> Para detalhes operacionais e troubleshooting no Replit, consulte `replit.md`.
+
 ---
 
 ## Configuração de Banco de Dados
@@ -222,15 +258,16 @@ Para recriar o banco do zero:
 php artisan migrate:fresh --seed
 ```
 
-### Seeders iniciais (clientes, produtos e fornecedores)
+### Seeders iniciais
 
-O `DatabaseSeeder` já registra os seeders abaixo:
+O `DatabaseSeeder` registra os seguintes seeders:
 
 | Seeder | Objetivo |
 |---|---|
 | `ClientSeeder` | Carga inicial de clientes |
 | `ProductSeeder` | Carga inicial de produtos |
 | `SupplierSeeder` | Carga inicial de fornecedores |
+| `SettingsSeeder` | Valores padrão para todas as 9 seções de configuração do sistema |
 
 Rodar todos os seeders:
 
@@ -244,9 +281,10 @@ Rodar seeders específicos:
 php artisan db:seed --class=ClientSeeder --no-interaction
 php artisan db:seed --class=ProductSeeder --no-interaction
 php artisan db:seed --class=SupplierSeeder --no-interaction
+php artisan db:seed --class=SettingsSeeder --no-interaction
 ```
 
-> Observação: os seeders já são idempotentes (`firstOrCreate`) e definidos para funcionar com UUID mesmo quando eventos de modelo estiverem desabilitados durante o `db:seed`.
+> Observação: os seeders já são idempotentes (`updateOrCreate` / `firstOrCreate`) e definidos para funcionar com UUID mesmo quando eventos de modelo estiverem desabilitados durante o `db:seed`.
 
 ### Docker sem trocar o `.env`
 
@@ -273,8 +311,9 @@ docker compose up -d --build
 Comandos de seed no container:
 
 ```bash
+docker compose exec app php artisan migrate
 docker compose exec app php artisan db:seed --no-interaction
-docker compose exec app php artisan db:seed --class=ClientSeeder --no-interaction
+docker compose exec app php artisan db:seed --class=SettingsSeeder --no-interaction
 ```
 
 ### Troubleshooting rápido de seed
@@ -320,26 +359,99 @@ O dashboard é composto por dois componentes Livewire full-page:
 - **Comparativos Mensais** — tabela com faturamento, variação % e pedidos vs mês anterior
 - **Tabela detalhada** — dados por período com busca em tempo real
 
-### Componente `<x-dashboard.kpi-card>`
+---
 
-| Prop | Tipo | Padrão | Descrição |
-|---|---|---|---|
-| `title` | `string` | — | Rótulo do card (ex.: `"Faturamento"`) |
-| `value` | `int\|float` | `0` | Valor numérico |
-| `currency` | `bool` | `false` | Se `true`, formata como `R$ x.xxx,xx` |
-| `trend` | `string\|null` | `null` | Variação percentual (ex.: `"+15,7%"`); negativo se iniciar com `-` |
-| `icon` | `string\|null` | `null` | SVG inline |
-| `iconBg` | `string` | `#EFF6FF` | Cor de fundo do ícone |
-| `iconColor` | `string` | `#3B82F6` | Cor do stroke do ícone |
+## Configurações do Sistema
 
-Cores padrão por indicador:
+Acessível em `/configuracoes` (link no dropdown do usuário na sidebar). Restrito a administradores via middleware.
 
-| Indicador | `iconBg` | `iconColor` |
+### Arquitetura
+
+A tabela `settings` usa o padrão **key-value** com agrupamento por seção:
+
+```sql
+settings (id, key UNIQUE, value TEXT, group, created_at, updated_at)
+```
+
+O model `App\Models\Setting` expõe helpers estáticos com **cache automático**:
+
+```php
+Setting::get('system_name', 'Nexora ERP');          // lê com cache
+Setting::set('system_name', 'Minha Empresa');        // grava e invalida cache
+Setting::group('general');                           // array key=>value do grupo
+Setting::allKeyed();                                 // todas as configurações
+```
+
+### Seções (9 abas)
+
+| Aba | Grupo | Configurações |
 |---|---|---|
-| Faturamento | `#EFF6FF` | `#3B82F6` (azul) |
-| Produtos | `#F5F3FF` | `#7C3AED` (roxo) |
-| Pedidos | `#FFFBEB` | `#D97706` (âmbar) |
-| Despesas | `#FFF1F2` | `#E11D48` (vermelho) |
+| **Geral** | `general` | Nome do sistema, Slogan, Fuso horário, Idioma, Formato de data/hora |
+| **Empresa** | `company` | Razão Social, CNPJ/IE, Endereço completo, E-mail, Telefone |
+| **Financeiro** | `financial` | Moeda, Separadores decimal/milhar, Alíquota padrão |
+| **Notificações** | `notifications` | Alertas de estoque, E-mail boas-vindas, Notif. browser, WhatsApp API |
+| **Aparência** | `appearance` | Tema (claro/escuro/sistema), Cor primária (7 paletas), Densidade, Sidebar |
+| **Segurança** | `security` | Tempo de sessão, Senha forte, Logs de atividade, Modo manutenção |
+| **Regras de Estoque** | `stock` | Venda sem estoque (Não/Autorização/Sim), Reserva (Pedido/Nota), Alerta crítico % |
+| **Regras Fiscais** | `fiscal` | CFOP padrão, Emissão automática NF-e, Ambiente (Homologação/Produção), Impostos em tempo real |
+| **Regras de Venda** | `sales` | Tipo de venda (Gerencial/Fiscal/Híbrido), Tabela de preços, Validade de orçamentos, Desconto máximo, Margem negativa, CPF obrigatório |
+
+### Rotas
+
+| Método | URI | Nome | Descrição |
+|---|---|---|---|
+| `GET` | `/configuracoes` | `configuration.index` | Exibe a página de configurações |
+| `POST` | `/configuracoes` | `configuration.store` | Salva todas as configurações |
+
+---
+
+## Controle de Usuários
+
+Acessível em `/users` (somente administradores via middleware `admin`).
+
+### Campos do Usuário
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `name` | string | Nome completo |
+| `email` | string | E-mail único |
+| `password` | string | Hash bcrypt |
+| `is_admin` | boolean | Acesso total sem restrições de licença ou status |
+| `is_active` | boolean | Usuário inativo não consegue fazer login |
+| `has_license` | boolean | Sem licença exibe modal de aviso a cada 15 s |
+| `modules` | JSON | Lista dos módulos contratados pelo usuário |
+
+### Regras de Negócio
+
+| Regra | Comportamento |
+|---|---|
+| `is_admin = true` | Acesso livre — sem verificação de licença ou status ativo |
+| `is_active = false` | Login bloqueado com mensagem: *"Usuário inativado, para mais informações entre em contato com o suporte"* |
+| `has_license = false` | Modal de aviso glassmorphism exibido a cada 15 s durante o uso do sistema |
+| Módulos | O usuário só acessa módulos habilitados no seu cadastro |
+
+---
+
+## Modal de Aviso de Licença
+
+Exibido em `layouts/app.blade.php` para usuários **ativos**, **não-admin** e **sem licença paga**.
+
+### Visual (Glassmorphism Dark)
+
+- **Overlay:** `rgba(0,0,0,0.70)` + `backdrop-blur(6px)`
+- **Modal:** `rgba(10,15,29,0.88)` + `backdrop-blur(28px)`, borda `rgba(255,255,255,0.10)`
+- **Ícone:** círculo amber (`#FBBF24`) centralizado no topo
+- **Botão primário:** gradiente `#2563EB → #06B6D4` — *"Falar com o Suporte"*
+- **Botão secundário:** border sutil — *"Entendi, fechar"*
+- **Botão X:** canto superior direito
+
+### Comportamento (JavaScript)
+
+1. Aparece **1,5 s** após o carregamento da página
+2. Fecha-se automaticamente após **8 s** (barra de progresso visual)
+3. Usuário pode fechar manualmente (botão X, botão "Entendi" ou clique no overlay)
+4. Após fechar: contador regressivo de **15 s** visível na tela
+5. Reabre automaticamente após os 15 s
 
 ---
 
@@ -351,10 +463,10 @@ O CSS é gerido por arquivos parciais importados em `resources/css/app.css`:
 |---|---|
 | `_base.css` | Reset, tipografia global, utilitários |
 | `_layout.css` | Sidebar, topbar, variáveis CSS (`:root`), app wrapper |
-| `_components.css` | Cards, KPIs, badges, botões, gráficos, atividades, comparativos |
+| `_components.css` | Cards, KPIs, badges, botões, gráficos, modal de licença, página de configurações |
 | `_tables.css` | Estilos de tabelas dos módulos |
 
-Classes principais do dashboard:
+### Classes principais — Dashboard
 
 | Classe CSS | Descrição |
 |---|---|
@@ -365,7 +477,55 @@ Classes principais do dashboard:
 | `.nx-activity-row` | Grid `1fr 1fr` para os dois painéis de atividade |
 | `.nx-desempenho-stats` | Grid de 3 colunas para o bloco de desempenho |
 
+### Classes principais — Configurações
+
+| Classe CSS | Descrição |
+|---|---|
+| `.nx-settings-layout` | Grid `220px 1fr` — sidebar de nav + área de conteúdo |
+| `.nx-settings-nav` | Sidebar de navegação entre abas (sticky) |
+| `.nx-settings-nav-item` | Botão de aba com estado `.active` |
+| `.nx-settings-content` | Painel de conteúdo — visível apenas com classe `.active` |
+| `.nx-settings-body` | Área de campos dentro de cada aba |
+| `.nx-settings-footer` | Rodapé com botão de salvar |
+| `.nx-toggle-row` | Linha com label + toggle switch |
+| `.nx-switch` | Componente switch (checkbox oculto + `.nx-switch-track`) |
+| `.nx-theme-cards` | Grid de 3 cards para seleção de tema visual |
+| `.nx-color-swatches` | Linha de bolinhas coloridas para cor primária |
+
+### Classes principais — Modal de Licença
+
+| Classe CSS | Descrição |
+|---|---|
+| `.nx-license-overlay` | Overlay fixo fullscreen — oculto por padrão |
+| `.nx-license-overlay--visible` | Exibe o overlay + anima o modal |
+| `.nx-license-modal` | Janela glassmorphism centralizada |
+| `.nx-license-modal-x` | Botão X no canto superior direito |
+| `.nx-license-modal-btn-primary` | Botão gradiente ciano (Falar com Suporte) |
+| `.nx-license-modal-progress-bar.nx-running` | Animação de drenagem da barra de progresso |
+
 > Após editar qualquer arquivo em `resources/css/`, rode `npm run build` para gerar o bundle de produção.
+
+---
+
+## Middleware `MaintenanceERP`
+
+Aplicado ao grupo de rotas autenticadas em `routes/web.php`. Rotas **liberadas** (renderizam normalmente):
+
+- `home` — página inicial `/`
+- `module.show` — página de detalhes do módulo
+- `module.item.development` — tela de funcionalidade em desenvolvimento
+- Módulos de item de módulo listados em `ModulePageController::moduleItemRouteNames()`
+- `products.*`, `clients.*`, `vehicles.*`, `employees.*`, `suppliers.*` — cadastros ativos
+- `role.*`, `roles.*` — funções/cargos
+- `users.*` — controle de usuários (somente admin via middleware separado)
+- `configuration.*` — configurações do sistema
+- `profile.*` — perfil do usuário
+- `permissions.*` — gerenciamento de permissões
+- `logs.*` — logs do sistema
+
+Todas as demais rotas retornam a view `system.desenvolvimento` ("Em Breve") até que o módulo esteja pronto.
+
+> **Atenção:** ao implementar uma nova rota que deve estar acessível, adicione o padrão `rotaNova.*` no bloco `if` do método `handle()` em `MaintenanceERP.php`.
 
 ---
 
@@ -385,27 +545,39 @@ php artisan make:filament-user
 
 ---
 
-## Middleware `MaintenanceERP`
-
-Aplicado globalmente a todas as rotas web. Rotas **liberadas** (renderizam normalmente):
-
-- `home` (página inicial `/`)
-- `module.show`
-- `module.item.development`
-- `products.*`
-- `clients.*`
-- `vehicles.*`
-- `employees.*`
-- `roles.*`
-- `suppliers.*`
-
-Todas as demais rotas retornam a view `system.desenvolvimento` ("Em Breve") até que o módulo esteja pronto.
-
-> **Atenção:** o recurso de funções está registrado como `role.*` em `routes/cadastro.php`, mas o middleware verifica `roles.*`. Mantenha consistência ao adicionar novas permissões ao grupo liberado.
-
----
-
 ## Modelos Principais
+
+### `Setting`
+
+| Campo | Tipo | Observações |
+|---|---|---|
+| `id` | bigint | Auto-increment |
+| `key` | string | Único — ex: `system_name`, `theme` |
+| `value` | text | Valor serializado como string |
+| `group` | string | Agrupamento — ex: `general`, `security`, `sales` |
+
+**Helpers estáticos:**
+
+| Método | Descrição |
+|---|---|
+| `Setting::get($key, $default)` | Retorna valor com cache |
+| `Setting::set($key, $value, $group)` | Grava e invalida o cache da chave |
+| `Setting::group($group)` | Retorna array `key => value` do grupo |
+| `Setting::allKeyed()` | Retorna todas as configurações como array |
+
+### `User`
+
+| Campo | Tipo | Observações |
+|---|---|---|
+| `id` | bigint | Auto-increment |
+| `name` | string | Nome completo |
+| `email` | string | Único |
+| `password` | string | Hash bcrypt |
+| `is_admin` | boolean | Administrador — acesso total |
+| `is_active` | boolean | Inativo = login bloqueado |
+| `has_license` | boolean | Sem licença = modal de aviso recorrente |
+| `modules` | JSON | Array de slugs dos módulos contratados |
+| `last_login_at` | timestamp | Nullable — data do último acesso |
 
 ### `Product`
 
@@ -522,7 +694,19 @@ Todas as rotas web estão sob o middleware `MaintenanceERP`. O arquivo `routes/w
 
 #### Administração (`routes/administracao.php`)
 
-- `Route::resource` → `profile`, `configuration`
+| Método | URI | Nome | Descrição |
+|---|---|---|---|
+| `GET` | `/configuracoes` | `configuration.index` | Página de configurações (9 seções) |
+| `POST` | `/configuracoes` | `configuration.store` | Salvar configurações |
+| `Route::resource` | `/profile` | `profile.*` | Perfil do usuário |
+
+#### Perfil / Segurança (`routes/perfil.php`) — middleware `admin`
+
+| Recurso | Rotas geradas | Descrição |
+|---|---|---|
+| `users` | `users.*` | Controle de usuários com status, licença e módulos |
+| `permissions` | `permissions.*` | Gerenciamento de permissões |
+| `logs` | `logs.*` | Logs do sistema |
 
 #### Cadastro (`routes/cadastro.php`)
 
@@ -544,8 +728,6 @@ Todas as rotas web estão sob o middleware `MaintenanceERP`. O arquivo `routes/w
   - `DELETE /products/{product}/suppliers/{supplier}` → `products.suppliers.destroy`
 
 #### Produção + Dashboard (`routes/producao.php`)
-
-> As rotas do Dashboard estão agrupadas neste arquivo até a criação de `routes/dashboard.php`.
 
 | Método | URI | Nome | Componente / Controller |
 |---|---|---|---|
@@ -587,10 +769,6 @@ Todas as rotas web estão sob o middleware `MaintenanceERP`. O arquivo `routes/w
 #### Estoque (`routes/estoque.php`)
 
 - `Route::resource` → `stock`
-
-#### Perfil / Segurança (`routes/perfil.php`)
-
-- `Route::resource` → `users`, `permissions`, `logs`
 
 ---
 
@@ -674,10 +852,13 @@ php artisan migrate:fresh --seed
 # Rodar todos os seeders
 php artisan db:seed --no-interaction
 
+# Rodar seeder de configurações
+php artisan db:seed --class=SettingsSeeder --no-interaction
+
 # Rodar seeders no Docker (container app)
 docker compose exec app php artisan db:seed --no-interaction
 
-# Limpar todos os caches
+# Limpar todos os caches (incluindo cache de configurações)
 php artisan optimize:clear
 
 # Build de assets para produção
@@ -702,6 +883,8 @@ php artisan about
 - **Seleções e checkboxes** no Blade: usar `@selected()` e `@checked()`.
 - **Ambiente não-local**: `AppServiceProvider` força HTTPS automaticamente.
 - **Comandos Laravel via Sail**: usar `./vendor/bin/sail artisan ...` se o projeto estiver rodando via Sail.
+- **Novas rotas**: ao criar uma rota que deve renderizar normalmente (não "Em Breve"), adicionar o padrão `rotaNova.*` ao whitelist em `app/Http/Middleware/MaintenanceERP.php`.
+- **Configurações do sistema**: usar `Setting::get()` / `Setting::set()` — nunca acessar a tabela `settings` diretamente fora do model.
 
 ---
 

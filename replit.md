@@ -1,78 +1,91 @@
-# Nexora EMS ERP
+# Nexora EMS ERP no Replit
 
-Sistema ERP modular em Laravel 12 com painel administrativo em Filament 4.5.
+Guia rápido para executar o `nexora-ems-erp` no Replit com o workflow já configurado no projeto.
 
-## Visão Geral
+## Status desta documentação
 
-O projeto organiza funcionalidades por domínio de negócio (cadastro, produção, vendas, compras, fiscal, financeiro, RH, logística, estoque, perfil e administração). A página inicial (`/`) exibe os módulos e as funcionalidades ainda não concluídas mostram a tela "Em Breve" via middleware `MaintenanceERP`.
+- Baseado no estado atual de `.replit`, `composer.json` e `package.json`
+- Última revisão: 2026-04-03
+- Documento principal do projeto: `README.md`
 
-## Stack
+## Stack e ambiente no Replit
 
-- **Backend**: Laravel 12 (PHP 8.2+)
-- **Admin Panel**: Filament 4.5 (`/admin`)
-- **Frontend**: Blade + Vite 7 + Tailwind CSS 4 + Bootstrap 5
-- **Testes**: Pest 3
-- **Banco de dados**: configurável por `DB_*` no `.env` (em `.env.example`, padrão atual: MySQL)
+- PHP `8.2`
+- Node.js `20`
+- Módulo web habilitado
+- Laravel `^12.0`
+- Filament `^4.5`
+- Livewire `^3.7`
+- Vite `^7.0`
 
-## Estrutura Essencial
+Configuração detectada em `.replit`:
 
-```text
-app/
-  Http/Controllers/
-    Api/
-  Http/Middleware/        # MaintenanceERP
-  Livewire/Cadastro/      # Telas de cadastro com Livewire
-  Models/
-  Providers/Filament/     # AdminPanelProvider
-routes/
-  web.php                 # Inclui os módulos web
-  api.php                 # Endpoints REST
-  cadastro.php
-  administracao.php
-  compras.php
-  producao.php
-  vendas.php
-  fiscal.php
-  financeiro.php
-  rh.php
-  logistica.php
-  estoque.php
-  perfil.php
-```
+- Workflow padrão: `Project`
+- Comando de execução: `php artisan serve --host=0.0.0.0 --port=5000`
+- Porta da aplicação: `5000` (mapeada para externa `80`)
+- Porta reservada para front/HMR: `3000`
+- Deploy build: `npm run build`
 
-## Setup e Execução
-
-Use os scripts oficiais do `composer.json`:
+## Setup inicial (primeira execução)
 
 ```bash
-composer run setup
-composer run dev
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --force
 ```
 
-O `setup` instala dependências, cria `.env` quando necessário, gera `APP_KEY`, executa migrações (`php artisan migrate --force`) e compila assets.
-
-## Middleware de Desenvolvimento
-
-O middleware `MaintenanceERP` está aplicado ao grupo de rotas web em `routes/web.php` e controla o que já pode renderizar normalmente.
-
-Rotas liberadas atualmente incluem:
-- `home`
-- `module.show`
-- `module.item.development`
-- `products.*`, `clients.*`, `vehicles.*`, `employees.*`, `suppliers.*`
-- `role.*` (recurso de funções)
-
-As demais rotas web retornam a view `system.desenvolvimento` até implementação completa.
-
-## Filament
-
-- Painel em `/admin`
-- Provider registrado em `bootstrap/providers.php`
-- Configuração em `app/Providers/Filament/AdminPanelProvider.php`
-- Discovery automático em `app/Filament/Resources`, `app/Filament/Pages` e `app/Filament/Widgets`
-
-Para criar usuário administrador:
+Se quiser usar SQLite no Replit para reduzir dependências externas:
 
 ```bash
+touch database/database.sqlite
+sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=sqlite/' .env
+sed -i 's/^DB_DATABASE=.*/DB_DATABASE=database\/database.sqlite/' .env
+php artisan migrate --force
+```
+
+## Rodando a aplicação
+
+Opção 1 (recomendada): clique no botão **Run** do Replit (workflow `Project`).
+
+Opção 2 (manual):
+
+```bash
+php artisan serve --host=0.0.0.0 --port=5000
+```
+
+## Front-end (Vite)
+
+Para desenvolvimento com HMR em porta separada:
+
+```bash
+npm run dev -- --host 0.0.0.0 --port 3000
+```
+
+Para build de produção:
+
+```bash
+npm run build
+```
+
+## Comandos úteis
+
+```bash
+php artisan route:list
+php artisan optimize:clear
+php artisan test
 php artisan make:filament-user
 ```
+
+## Observações importantes
+
+- O middleware `MaintenanceERP` limita rotas ainda em desenvolvimento para a tela `system.desenvolvimento`.
+- Rotas principais liberadas incluem `home`, `module.*`, `products.*`, `clients.*`, `suppliers.*`, `employees.*`, `vehicles.*`, `role.*`, `users.*`, `configuration.*`, `profile.*`, `permissions.*` e `logs.*`.
+- Ao adicionar uma rota nova que deve abrir normalmente, inclua o padrão correspondente no whitelist de `app/Http/Middleware/MaintenanceERP.php`.
+
+## Troubleshooting rápido
+
+- Se houver erro de banco na subida, valide os `DB_*` no `.env`.
+- Se os assets estiverem desatualizados, rode `npm run build` novamente.
+- Se cache/rotas estiverem inconsistentes, rode `php artisan optimize:clear`.

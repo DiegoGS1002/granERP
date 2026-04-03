@@ -4,44 +4,122 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class UsersController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all(); // ou paginate(10)
+        $query = User::orderBy('name');
 
-        return view('cadastro.usuarios.index', compact('users'));
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('perfil')) {
+            $query->where('is_admin', $request->input('perfil') === 'admin');
+        }
+
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->input('status') === 'ativo');
+        }
+
+        $users = $query->paginate(15)->withQueryString();
+
+        $stats = [
+            'total'    => User::count(),
+            'admins'   => User::where('is_admin', true)->count(),
+            'inativos' => User::where('is_active', false)->count(),
+            'licencas' => User::where('has_license', true)->count(),
+        ];
+
+        return view('admin.users.index', compact('users', 'stats'));
     }
 
-    public function create(){
-        return view('cadastro.usuarios.create');
+    public function create()
+    {
+        return view('admin.users.create');
     }
 
-   public function store(Request $request)
+    public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'identification_number' => 'required|string|max:20|unique:employees',
-            'role' => 'required|string|max:50',
-            'email' => 'required|email|unique:employees,email',
-            'phone_number' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:255',
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'email'       => 'required|email|unique:users,email',
+            'password'    => 'required|string|min:8|confirmed',
+            'is_admin'    => 'required|in:0,1',
+            'is_active'   => 'required|in:0,1',
+            'has_license' => 'required|in:0,1',
+            'modules'     => 'nullable|array',
+            'modules.*'   => 'string',
         ]);
 
         User::create([
-            'name' => $request->name,
-            'identification_number' => $request->identification_number,
-            'role' => $request->role,
-            'email' => $request->email,
-            'phone_number' => $request->phone_number,
-            'address' => $request->address,
-            'password' => bcrypt(Str::random(10)), // Gerar senha aleatória
+            'name'        => $validated['name'],
+            'email'       => $validated['email'],
+            'password'    => $validated['password'],
+            'is_admin'    => (bool) $validated['is_admin'],
+            'is_active'   => (bool) $validated['is_active'],
+            'has_license' => (bool) $validated['has_license'],
+            'modules'     => $validated['modules'] ?? [],
         ]);
 
         return redirect()
             ->route('users.index')
             ->with('success', 'Usuário salvo com sucesso!');
+    }
+
+    public function edit(User $user)
+    {
+        return view('admin.users.edit', compact('user'));
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'email'       => 'required|email|unique:users,email,' . $user->id,
+            'password'    => 'nullable|string|min:8|confirmed',
+            'is_admin'    => 'required|in:0,1',
+            'is_active'   => 'required|in:0,1',
+            'has_license' => 'required|in:0,1',
+            'modules'     => 'nullable|array',
+            'modules.*'   => 'string',
+        ]);
+
+        $user->name        = $validated['name'];
+        $user->email       = $validated['email'];
+        $user->is_admin    = (bool) $validated['is_admin'];
+        $user->is_active   = (bool) $validated['is_active'];
+        $user->has_license = (bool) $validated['has_license'];
+        $user->modules     = $validated['modules'] ?? [];
+
+        if (!empty($validated['password'])) {
+            $user->password = $validated['password'];
+        }
+
+        $user->save();
+
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'Usuário atualizado com sucesso!');
+    }
+
+    public function destroy(User $user)
+    {
+        if ($user->id === Auth::id()) {
+            return redirect()
+                ->route('users.index')
+                ->with('error', 'Você não pode excluir a própria conta.');
+        }
+
+        $user->delete();
+
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'Usuário excluído com sucesso!');
     }
 }

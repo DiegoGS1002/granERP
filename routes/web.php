@@ -2,9 +2,19 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\MaintenanceERP;
+use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\ModulePageController;
 
-Route::middleware([MaintenanceERP::class])->group(function () {
+Route::middleware('guest')->group(function () {
+    Route::view('/login', 'auth.login')->name('login');
+    Route::post('/login', [SessionController::class, 'store'])->name('login.store');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
+});
+
+Route::middleware(['auth', 'midnight.session', MaintenanceERP::class])->group(function () {
 
     Route::get('/', function () {
         return view('home-page', [

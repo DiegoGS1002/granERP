@@ -1,10 +1,15 @@
 <?php
 
 use App\Http\Controllers\ModulePageController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 it('renders module page for cadastro', function () {
+    $this->actingAs(User::factory()->create([
+        'last_login_at' => now(),
+    ]));
+
     $response = $this->get(route('module.show', 'cadastro'));
 
     $response->assertOk();
@@ -12,6 +17,10 @@ it('renders module page for cadastro', function () {
 });
 
 it('redirects to real page when module item route exists', function () {
+    $this->actingAs(User::factory()->create([
+        'last_login_at' => now(),
+    ]));
+
     $response = $this->get(route('module.item.development', [
         'module' => 'cadastro',
         'item' => 'clientes',
@@ -21,6 +30,10 @@ it('redirects to real page when module item route exists', function () {
 });
 
 it('redirects dashboard kpi item to live route', function () {
+    $this->actingAs(User::factory()->create([
+        'last_login_at' => now(),
+    ]));
+
     $response = $this->get(route('module.item.development', [
         'module' => 'dashboard',
         'item' => 'indicadores-kpi',
@@ -30,6 +43,10 @@ it('redirects dashboard kpi item to live route', function () {
 });
 
 it('shows development page when module item route does not exist', function () {
+    $this->actingAs(User::factory()->create([
+        'last_login_at' => now(),
+    ]));
+
     $missing = collect(ModulePageController::allModules())
         ->map(function (array $module) {
             $missingItem = collect($module['items'])

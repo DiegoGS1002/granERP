@@ -18,9 +18,9 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'name', 'email', 'password',
+        'is_admin', 'is_active', 'has_license',
+        'modules', 'last_login_at',
     ];
 
     /**
@@ -42,7 +42,12 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
+            'is_admin'          => 'boolean',
+            'is_active'         => 'boolean',
+            'has_license'       => 'boolean',
+            'modules'           => 'array',
+            'last_login_at'     => 'datetime',
         ];
     }
 }

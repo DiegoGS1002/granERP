@@ -33,7 +33,16 @@ class MaintenanceERP
             $request->routeIs('vehicles.*') ||
             $request->routeIs('employees.*') ||
             $request->routeIs('roles.*') ||
-            $request->routeIs('suppliers.*')
+            $request->routeIs('role.*') ||
+            $request->routeIs('suppliers.*') ||
+            // administracao de usuarios (somente admin)
+            $request->routeIs('users.*') ||
+            // configurações do sistema
+            $request->routeIs('configuration.*') ||
+            // perfil e permissões
+            $request->routeIs('profile.*') ||
+            $request->routeIs('permissions.*') ||
+            $request->routeIs('logs.*')
         ) {
             return $next($request);
         }
