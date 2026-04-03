@@ -222,6 +222,32 @@ Para recriar o banco do zero:
 php artisan migrate:fresh --seed
 ```
 
+### Seeders iniciais (clientes, produtos e fornecedores)
+
+O `DatabaseSeeder` já registra os seeders abaixo:
+
+| Seeder | Objetivo |
+|---|---|
+| `ClientSeeder` | Carga inicial de clientes |
+| `ProductSeeder` | Carga inicial de produtos |
+| `SupplierSeeder` | Carga inicial de fornecedores |
+
+Rodar todos os seeders:
+
+```bash
+php artisan db:seed --no-interaction
+```
+
+Rodar seeders específicos:
+
+```bash
+php artisan db:seed --class=ClientSeeder --no-interaction
+php artisan db:seed --class=ProductSeeder --no-interaction
+php artisan db:seed --class=SupplierSeeder --no-interaction
+```
+
+> Observação: os seeders já são idempotentes (`firstOrCreate`) e definidos para funcionar com UUID mesmo quando eventos de modelo estiverem desabilitados durante o `db:seed`.
+
 ### Docker sem trocar o `.env`
 
 O `docker-compose.yml` injeta as variáveis de banco no container `app` via `DOCKER_DB_*`, permitindo manter o `.env` com credenciais locais.
@@ -242,6 +268,25 @@ DOCKER_DB_EXPOSED_PORT=3307
 ```bash
 export DOCKER_DB_PASSWORD=minha_senha_forte
 docker compose up -d --build
+```
+
+Comandos de seed no container:
+
+```bash
+docker compose exec app php artisan db:seed --no-interaction
+docker compose exec app php artisan db:seed --class=ClientSeeder --no-interaction
+```
+
+### Troubleshooting rápido de seed
+
+- Erro `getaddrinfo for db failed`: ocorre ao rodar `php artisan` fora do Docker com `DB_HOST=db`.
+  - Opção 1: rode os comandos via container (`docker compose exec app ...`).
+  - Opção 2: ajuste `DB_HOST` no `.env` local para um host acessível (ex.: `127.0.0.1` ou `localhost`).
+- Erro `storage/logs/laravel.log could not be opened in append mode`: permissões de escrita no diretório `storage/`.
+
+```bash
+sudo chown -R "$USER":"$USER" storage bootstrap/cache
+chmod -R ug+rw storage bootstrap/cache
 ```
 
 ---
@@ -625,6 +670,12 @@ php artisan route:list
 
 # Recriar banco e rodar seeders
 php artisan migrate:fresh --seed
+
+# Rodar todos os seeders
+php artisan db:seed --no-interaction
+
+# Rodar seeders no Docker (container app)
+docker compose exec app php artisan db:seed --no-interaction
 
 # Limpar todos os caches
 php artisan optimize:clear

@@ -33,7 +33,7 @@ class SupplierSeeder extends Seeder
                 'address_zip_code' => '20040002',
                 'address_street' => 'Avenida Central',
                 'address_number' => '456',
-                'address_complement' => null,
+                'address_complement' => 'Sem complemento',
                 'address_district' => 'Centro',
                 'address_city' => 'Rio de Janeiro',
                 'address_state' => 'RJ',
@@ -56,7 +56,10 @@ class SupplierSeeder extends Seeder
         ];
 
         foreach ($suppliers as $supplier) {
-            Supplier::create($supplier);
+            Supplier::firstOrCreate(
+                ['taxNumber' => $supplier['taxNumber']],
+                ['id' => (string) Str::uuid(), ...$supplier]
+            );
         }
     }
 }
